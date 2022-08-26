@@ -7,22 +7,25 @@
 if (isset($_POST['enviar'])) {
 
    $nombre = $_POST['nombre'];
-   $imagen = $_FILES['archivo']['name'];
-  /* $product_image_tmp_name = $_FILES['product_image']['tmp_name'];
-   $product_image_folder = 'uploaded_img/'.$product_image;
-   $describcion = $_POST['describcion'];*/
-if (empty($nombre) ||/* empty($imagen) ||*/ empty($describcion) ) {
-	echo "datos no guardados";
+   $fecha_img = new DateTime();
+   $imagen =$fecha_img->getTimestamp()."_".$_FILES['archivo']['name'];
+   $image_tmp = $_FILES['archivo']['tmp_name'];
+   $image_folder = 'imagenes/'.$imagen;
+   $describcion = $_POST['describcion'];
+if (empty($nombre) || empty($imagen) || empty($describcion) ) {
+	echo "se requiere llenar todos los datos para registrar";
 }else{
         
     $objConexion= new conexion();
 
+move_uploaded_file($image_tmp, $image_folder);
     $sql="INSERT INTO `proyectos` (`nombre`, `imagen`, `describcion`) 
-    VALUES ('$nombre', 'si', '$describcion');";
+    VALUES ('$nombre', '$imagen', '$describcion');";
+
 
 	$objConexion->ejecutar($sql);
-
-	echo "datos guardados";
+header("location:portafolio.php");
+	
 }
 	
 }
@@ -31,9 +34,11 @@ if (isset($_GET['borrar'])) {
 $id = $_GET['borrar'];
 // "DELETE FROM proyectos WHERE `proyectos`.`id` = 2"
 	  $objConexion= new conexion();
-	  $sql="DELETE FROM proyectos WHERE `proyectos`.`id` = ".$id;
-      $objConexion->ejecutar($sql);
-
+	  $imagen=$objConexion->consultar("SELECT imagen FROM `proyectos` where `id`=".$id);
+	  unlink("imagenes/".$imagen[0]['imagen']);
+	 $sql="DELETE FROM proyectos WHERE `proyectos`.`id` = ".$id;
+      $objConexion->ejecutar($sql);  // con esta sentencia podemos borrar de la base de datos 
+header("location:portafolio.php");
 
 }
 
@@ -57,9 +62,13 @@ $id = $_GET['borrar'];
 	<div class="card-body">
 		<form action="portafolio.php" method="post" enctype="multipart/form-data">
 	
-<label for="nom">Nombre del proyecto</label><input type="text" class="form-control" name="nombre" id="nom"><br>
-<label for="desc">Descripcion del proyecto</label><input type="text" class="form-control" name="describcion" id="desc"><br>
-<label for="img">Imagen del proyecto</label><input type="file" class="form-control" name="archivo" id="img"><br>
+<label for="nom">Nombre del proyecto</label>
+       <input type="text" class="form-control" name="nombre" id="nom" autocomplete="off"><br>
+<label for="desc">Descripcion del proyecto</label>
+<textarea class="form-control" name="describcion" id="desc" rows="3"></textarea>
+     <!--  <input type="text" class="form-control" name="describcion" id="desc">--><br>
+<label for="img">Imagen del proyecto</label>
+       <input type="file" class="form-control" name="archivo" id="img"><br>
 
 <input type="submit" class="btn btn-success" value="Enviar proyecto" name="enviar">
 
@@ -93,7 +102,7 @@ foreach ($resultado as $proyecto) {
 		<tr>
 			<td><?php echo $proyecto['id']; ?></td>
 			<td><?php echo $proyecto['nombre']; ?></td>
-			<td><?php echo $proyecto['imagen']; ?></td>
+			<td><img src="imagenes/<?php echo $proyecto['imagen']; ?>" alt="si" width="100px" accept="image/png, image/jpeg, image/jpg"></td>
 			<td><?php echo $proyecto['describcion']; ?></td>
 			<td><a  class="btn btn-danger" href="?borrar=<?php echo $proyecto['id']; ?>" name="borrar">Eliminar</a></td>
 		</tr>

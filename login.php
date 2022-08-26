@@ -42,8 +42,8 @@ if ($_POST) {
        
       <form action="login.php" method="post">
     <label for="us">Usuario:</label>
-    <input type="text" name="usuario" id="us" class="form-control" autocomplete="off"><br>
-     <label for="cont"> Contraseña:</label> <input type="text" class="form-control" name="contraseña" id="con" autocomplete="off"><br>
+    <input type="text" name="usuario" id="us" class="form-control" autocomplete="off" placeholder="develoteca"><br>
+     <label for="cont"> Contraseña:</label> <input type="text" class="form-control" name="contraseña" id="con" autocomplete="off" placeholder="12345"><br>
      <button type="submit" class="btn btn-success">Entrar al portafolio</button>
   </form>
       </div>
